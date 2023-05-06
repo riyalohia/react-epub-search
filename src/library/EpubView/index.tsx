@@ -6,8 +6,6 @@ import { EpubViewStyle as defaultStyles } from './style'
 import { EpubViewProps } from '../../types'
 import { Book, Rendition } from 'epubjs'
 
-// MTL removed - line does not seem like a requirement any more (and was causing an error)
-// global.ePub = Epub; // Fix for v3 branch of epub.js -> needs ePub to by a global var
 interface IHighlight {
   cfi: string;
 }
@@ -31,10 +29,6 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
     tocChanged: null,
     epubOptions: {},
     epubInitOptions: {},
-    // theme: {
-    //   color: themes.LIGHT,
-    //   fontSize: 100
-    // }
   };
 
   location: EpubViewProps['location'];
@@ -62,11 +56,22 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
   }
 
   componentDidMount() {
-    this.initBook()
+    this.initBook();
     document.addEventListener('keyup', this.handleKeyPress, false)
   }
 
-  initBook() {
+  resetBook(navigateToTop?: boolean) {
+    this.setState(
+      {
+        isLoaded: false
+      },
+      () => {
+        this.initBook(navigateToTop);
+      }
+    );
+  }
+
+  initBook(navigateToTop: boolean = true) {
     const { url, tocChanged, epubInitOptions } = this.props
     if (this.book) {
       this.book.destroy()
@@ -80,7 +85,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
         },
         () => {
           tocChanged && tocChanged(toc)
-          this.initReader()
+          this.initReader(navigateToTop)
         }
       )
     })
@@ -111,16 +116,23 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
       this.rendition.display(this.props.location as number)
     }
     if (prevProps.url !== this.props.url) {
-      this.initBook()
+      this.resetBook()
     }
     if (prevProps.searchTerm !== this.props.searchTerm) {
       this.onSearchChange(this.props.searchTerm);
     }
+    if (prevProps.fontSize !== this.props.fontSize) {
+      this.renderFontSize();
+    }
+    if (prevProps.themeColor !== this.props.themeColor) {
+      this.changeThemeColor();
+    }
   }
 
-  initReader() {
+  initReader(navigateToTop?: boolean) {
     const { toc } = this.state
-    const { location, epubOptions, searchTerm, getRendition } = this.props
+    const { location, epubOptions, searchTerm, fontSize, themeColor, resetBook, getRendition } = this.props;
+    const updatedLocation = navigateToTop ? 0 : location;
     const node = this.viewerRef.current
     this.rendition = this.book.renderTo(node, {
       // @ts-ignore
@@ -137,14 +149,26 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
       this.rendition.next()
     }
     this.registerEvents()
-    getRendition && getRendition(this.rendition)
+    this.registerTheme();
 
-    if (typeof location === 'string' || typeof location === 'number') {
-      this.rendition.display(location as number)
+    if (getRendition) getRendition(this.rendition);
+    if (resetBook) resetBook(this.resetBook);
+
+    if (typeof updatedLocation === 'string' || typeof updatedLocation === 'number') {
+      this.rendition.display(updatedLocation as number)
     } else if (toc.length > 0 && toc[0].href) {
       this.rendition.display(toc[0].href)
     } else {
       this.rendition.display()
+    }
+
+    // Apply theme on book initialization
+    if (themeColor) {
+      this.rendition.themes.select(themeColor);
+    } 
+
+    if (fontSize) {
+      this.renderFontSize();
     }
 
     if (searchTerm) {
@@ -153,22 +177,68 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
   }
 
   registerEvents() {
-    const { handleKeyPress, handleTextSelected } = this.props
+    const { handleKeyPress, handleTextSelected, handleImageClick } = this.props
     this.rendition.on('locationChanged', this.onLocationChange)
     this.rendition.on('keyup', handleKeyPress || this.handleKeyPress)
+    if (handleImageClick) this.rendition.on('rendered', this.onHandleImage);
     if (handleTextSelected) {
       this.rendition.on('selected', handleTextSelected)
     }
   }
 
+  registerTheme() {
+    const { theme } = this.props;
+    if (theme) this.rendition.themes.register(theme);
+  }
+
+  renderFontSize() {
+    const { fontSize } = this.props;
+    this.rendition.themes.fontSize(`${fontSize}%`);
+    this.rendition.views().forEach((view) => {
+      // @ts-ignore
+      if (view.pane) view.pane.render();
+    });
+  }
+
+  changeThemeColor() {
+    // This is a hack because switching between themes is not smooth
+    // Refer https://github.com/futurepress/epub.js/issues/1208
+    this.resetBook(false);
+  }
+
   onLocationChange = (loc: any) => {
-    const { location, locationChanged } = this.props
+    const { location, onNavigation, locationChanged } = this.props
     const newLocation = loc && loc.start
     if (location !== newLocation) {
       this.location = newLocation
-      locationChanged && locationChanged(newLocation)
+      const isEndOfBook = this.rendition.location.atEnd;
+      const isStartOfBook = this.rendition.location.atStart;
+      const locations = this.rendition.location;
+
+      const currentChapter =
+        // @ts-ignore
+        this.rendition.book.spine.items[locations.start.index]?.idref;
+      const pageNoInChapter = locations.start?.displayed?.page;
+      if (locationChanged) locationChanged(newLocation);
+      if (onNavigation) onNavigation({
+        isEndOfBook,
+        isStartOfBook,
+        currentChapter,
+        pageNoInChapter,
+      });
     }
-  }
+  };
+
+  onHandleImage = (_e: any, i: any) => {
+    const { handleImageClick } = this.props;
+    i.document.documentElement.addEventListener('click', (e: any) => {
+      const imageSrc = e.target.src;
+      const imageHeight = e.target.height;
+      const imageWidth = e.target.width;
+      if (handleImageClick) handleImageClick(imageSrc, imageHeight, imageWidth);
+    });
+  };
+
 
   searchWithinBook = (searchTerm: string) => {
     // @ts-ignore
@@ -204,7 +274,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
 
   renderBook() {
     const { styles } = this.props
-    return <div ref={this.viewerRef}  style={{ height: '100%' }} />
+    return <div ref={this.viewerRef} style={{ height: '100%' }} />
   }
 
   handleKeyPress = ({ key }: { key: string }) => {
@@ -215,7 +285,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
   render() {
     const { isLoaded } = this.state
     const { loadingView, styles } = this.props
- 
+
     return (
       <div style={{
         position: 'relative',

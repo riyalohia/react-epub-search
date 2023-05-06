@@ -24,7 +24,6 @@ export interface ITheme {
 }
 
 interface INavigationProps {
-  direction: string;
   currentChapter: number;
   pageNoInChapter: number;
   isStartOfBook: boolean;
@@ -42,11 +41,14 @@ export interface EpubViewProps {
   location?: string | number;
   showToc?: boolean;
   currentSearchPosition?: number;
-  theme?: ITheme;
+  theme?: object;
+  fontSize?: number;
+  themeColor?: string;
   onNavigation?(obj: INavigationProps): void;
   onChangeSearchResults?(results: ISearchResult[]): void;
   locationChanged?(value: string | number): void;
   tocChanged?(value: NavItem[]): void;
+  resetBook?: (func: () => void) => void;
   getRendition?(rendition: Rendition): void;
   handleKeyPress?(): void;
   handleImageClick?(src: string, height: number, width: number): void;

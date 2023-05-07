@@ -1,28 +1,20 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 // @ts-ignore
 import Epub from 'epubjs/lib/index'
-import { EpubViewStyle as defaultStyles } from './style'
-import { EpubViewProps } from '../../types'
+import { EpubViewStyle } from './style'
+import { IEpubViewProps } from '../../types'
 import { Book, Rendition } from 'epubjs'
 
-interface IHighlight {
-  cfi: string;
-}
-
 interface EpubViewState {
-  //prevSearchPosition: string;
   isLoaded: boolean;
-  // isSearchLoading: boolean;
-  // searchHighlights: IHighlight[];
   toc: any[];
 };
 
+// Exclude the html tags that are not visible in render tree.
 const searchExcludedKeywords = ['cvi', 'Title', 'title', 'part', 'toc'];
 
-class EpubView extends Component<EpubViewProps, EpubViewState> {
+class EpubView extends Component<IEpubViewProps, EpubViewState> {
   public static defaultProps = {
-    currentSearchPosition: 1,
     searchTerm: '',
     loadingView: null,
     locationChanged: null,
@@ -31,7 +23,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
     epubInitOptions: {},
   };
 
-  location: EpubViewProps['location'];
+  location: IEpubViewProps['location'];
 
   book: Book;
 
@@ -43,7 +35,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
 
   nextPage: () => void;
 
-  constructor(props: EpubViewProps) {
+  constructor(props: IEpubViewProps) {
     super(props)
     this.state = {
       isLoaded: false,
@@ -100,7 +92,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
     document.removeEventListener('keyup', this.handleKeyPress, false)
   }
 
-  shouldComponentUpdate(nextProps: EpubViewProps) {
+  shouldComponentUpdate(nextProps: IEpubViewProps) {
     return (
       !this.state.isLoaded ||
       nextProps.location !== this.props.location ||
@@ -108,7 +100,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
     )
   }
 
-  componentDidUpdate(prevProps: EpubViewProps) {
+  componentDidUpdate(prevProps: IEpubViewProps) {
     if (
       prevProps.location !== this.props.location &&
       this.location !== this.props.location
@@ -118,7 +110,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
     if (prevProps.url !== this.props.url) {
       this.resetBook()
     }
-    if (prevProps.searchTerm !== this.props.searchTerm) {
+    if (prevProps.searchTerm !== this.props.searchTerm && this.props.searchTerm) {
       this.onSearchChange(this.props.searchTerm);
     }
     if (prevProps.fontSize !== this.props.fontSize) {
@@ -274,7 +266,7 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
 
   renderBook() {
     const { styles } = this.props
-    return <div ref={this.viewerRef} style={{ height: '100%' }} />
+    return <div ref={this.viewerRef} style={{ ...EpubViewStyle.view, ...styles?.view }} />
   }
 
   handleKeyPress = ({ key }: { key: string }) => {
@@ -288,9 +280,8 @@ class EpubView extends Component<EpubViewProps, EpubViewState> {
 
     return (
       <div style={{
-        position: 'relative',
-        height: '100%',
-        width: '100%'
+        ...EpubViewStyle.viewHolder,
+        ...styles?.viewHolder
       }}>
         {(isLoaded && this.renderBook()) || loadingView}
       </div>

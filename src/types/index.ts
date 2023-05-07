@@ -3,7 +3,7 @@ import { BookOptions } from 'epubjs/types/book';
 import { RenditionOptions } from 'epubjs/types/rendition';
 import { Contents, NavItem, Rendition } from 'epubjs';
 
-export interface Toc {
+export interface IToc {
   label: string;
   href: string;
 }
@@ -13,34 +13,26 @@ export interface ISearchResult {
   excerpt: string;    
 };
 
-interface INavigation {
-  direction: string;
-  searchPosition: number;
-}
-
-export interface ITheme {
-  color: string;
-  fontSize: number;
-}
-
-interface INavigationProps {
+export interface INavigationProps {
   currentChapter: number;
   pageNoInChapter: number;
   isStartOfBook: boolean;
   isEndOfBook: boolean;
 }
 
-export interface EpubViewProps {
-  resize?: boolean;
+export interface IEpubViewStyles {
+  view?: React.CSSProperties;
+  viewHolder?: React.CSSProperties;
+};
+
+export interface IEpubViewProps {
   url: string | ArrayBuffer;
-  searchTerm: string;
+  searchTerm?: string;
   epubInitOptions?: BookOptions;
   epubOptions?: RenditionOptions;
-  styles?: React.CSSProperties;
+  styles?: IEpubViewStyles;
   loadingView?: React.ReactNode;
   location?: string | number;
-  showToc?: boolean;
-  currentSearchPosition?: number;
   theme?: object;
   fontSize?: number;
   themeColor?: string;
@@ -53,22 +45,31 @@ export interface EpubViewProps {
   handleKeyPress?(): void;
   handleImageClick?(src: string, height: number, width: number): void;
   handleTextSelected?(cfiRange: string, contents: Contents): void;
-  onChangeSearchPosition?(position: number): void;
-  onDisableNavigation?(disable: boolean): void;
 }
 
-export interface EpubReaderProps extends Omit<EpubViewProps, 'styles'> {
-  title?: string;
+export interface IEpubReaderProps extends Omit<IEpubViewProps, 'styles'> {
+  prevButton?: React.ReactElement;
+  nextButton?: React.ReactElement;
+  tocToggleButton?: React.ReactElement;
+  tocContainerWidth?: string;
+  tocItem?: React.ReactElement;
   showToc?: boolean;
-  styles?: React.CSSProperties;
-  swipeable?: boolean;
-  epubViewStyles?: EpubViewProps['styles'];
-  onNavigation?(obj: INavigationProps): void;
+  styles?: IReactReaderStyle;
+  epubViewStyles?: IEpubViewProps['styles'];
 }
 
 export interface TocItemProps {
   label: string;
   href: string;
+  subitems?: TocItemProps[];
   setLocation: (href: string) => void;
-  styles: any;
-}
+};
+
+export interface IReactReaderStyle {
+  container: React.CSSProperties;
+  readerArea: React.CSSProperties;
+  containerExpanded: React.CSSProperties;
+  reader: React.CSSProperties;
+  tocArea: React.CSSProperties;
+  tocAreaButton: React.CSSProperties;
+};

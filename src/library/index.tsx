@@ -1,3 +1,4 @@
-import EpubView from './EpubView'
+import EpubView from './EpubView';
+import EpubReader from './EpubReader';
 
-export { EpubView }
+export { EpubView, EpubReader }

@@ -73,3 +73,9 @@ export interface IReactReaderStyle {
   tocArea: React.CSSProperties;
   tocAreaButton: React.CSSProperties;
 };
+
+declare class EpubView extends React.Component<IEpubViewProps> {}
+
+declare class EpubReader extends React.Component<IEpubReaderProps> {}
+
+export { EpubView, EpubReader };

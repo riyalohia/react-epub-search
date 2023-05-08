@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import EpubView from '../EpubView/index'
 import { EpubReaderStyle as defaultStyles } from './style'
-import { IEpubReaderProps, IToc } from '../../types'
+import { IEpubReaderProps, IToc } from '../../../types'
 import { NavItem } from 'epubjs'
 import TocToggleButton from './TocToggleButton'
 import { NextButton, PrevButton } from './NavigationButtons'

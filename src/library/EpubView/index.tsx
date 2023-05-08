@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // @ts-ignore
 import Epub from 'epubjs/lib/index'
 import { EpubViewStyle } from './style'
-import { IEpubViewProps } from '../../types'
+import { IEpubViewProps } from '../../../types'
 import { Book, Rendition } from 'epubjs'
 
 interface EpubViewState {

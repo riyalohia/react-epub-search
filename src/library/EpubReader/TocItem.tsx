@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TocItemProps } from '../../types';
+import { TocItemProps } from '../../../types';
 
 const styles = {
   tocAreaButton: {

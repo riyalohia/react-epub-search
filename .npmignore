@@ -2,6 +2,7 @@ src/
 test/
 www/
 demo/
+node_modules/
 webpack.config.js
 webpack.build.config.js
 .gitignore

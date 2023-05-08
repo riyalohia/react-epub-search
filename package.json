@@ -1,8 +1,14 @@
 {
-  "name": "my-app",
+  "name": "react-epub-search",
   "version": "0.1.0",
-  "private": true,
+  "description": "An epub-reader for React integrated with search powered by ePubJS",
+  "main": "lib/index.js",
   "devDependencies": {
+    "@babel/cli": "^7.17.3",
+    "@babel/core": "^7.17.4",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.21.5",
     "@types/node": "^16.18.25",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
@@ -19,10 +25,16 @@
   "peerDependencies": {
     "react": ">=18.2.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riyalohia/react-epub-search.git"
+  },
+  "author": "Riya Lohia",
   "scripts": {
+    "compile": "NODE_ENV=production babel --out-dir lib src/library --extensions '.ts,.tsx'",
+    "prepare": "npm run compile",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -42,5 +54,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "types": "src/types/index.d.ts"
 }

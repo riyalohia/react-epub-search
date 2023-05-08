@@ -7,7 +7,7 @@ import TocToggleButton from './TocToggleButton'
 import { NextButton, PrevButton } from './NavigationButtons'
 import TocItem from './TocItem'
 
-const EpubReader = (props: IEpubReaderProps) => {
+const EpubReader: React.FC<IEpubReaderProps> = (props) => {
   const {
     showToc = true,
     tocContainerWidth = '256px',

@@ -76,6 +76,6 @@ export interface IReactReaderStyle {
 
 declare class EpubView extends React.Component<IEpubViewProps> {}
 
-declare class EpubReader extends React.Component<IEpubReaderProps> {}
+declare function EpubReader(props: IEpubReaderProps): React.ReactElement;
 
 export { EpubView, EpubReader };

@@ -55,5 +55,11 @@
       "last 1 safari version"
     ]
   },
+  "keywords": [
+    "react",
+    "epub",
+    "epubJS",
+    "react reader"
+  ],
   "types": "types/index.d.ts"
 }

@@ -1,6 +1,6 @@
 {
   "name": "react-epub-search",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An epub-reader for React integrated with search powered by ePubJS",
   "main": "lib/index.js",
   "devDependencies": {

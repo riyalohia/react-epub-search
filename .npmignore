@@ -18,3 +18,4 @@ files
 .editorconfig
 .npmignore
 babel.config.json
+tsconfig.json

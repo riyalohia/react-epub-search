@@ -71,7 +71,6 @@ const App = () => {
 
 Other Functionalities:
 1. Theme (Light/Dark)
-2. Theme Change (Color and Font Size)
-3. Reset Reader (Used for toggle theme) (Bug of EpubJS)
-4. navigationChangehandler (Used for right-left arrow keys)
-5. Image Click
+2. Font Size Change
+3. Navigation Change (Used for right-left arrow keys)
+4. Image Click
